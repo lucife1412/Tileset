@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&#x51c6;&#x5907;&#x5de5;&#x4f5c;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="准备工作">准备工作</h1>
+<ul>
+<li><strong>Node.js</strong>：确保你的电脑已安装 Node.js 或 Python。</li>
+</ul>
+<h2 id="操作步骤">操作步骤</h2>
+<h2 id="1-放置-3d-模型文件">1. 放置 3D 模型文件</h2>
+<p>将你的 3D 模型文件夹（例如包含 <code>tileset.json</code> 的文件夹）复制到 <code>Tileset</code> 目录中。</p>
+<p>例如：</p>
+<pre><code>Tileset/你的模型文件夹名/tileset.json
+</code></pre>
+<h2 id="2-配置模型路径">2. 配置模型路径</h2>
+<p>如果你添加了新的模型，需要修改 <code>index.html</code> 中的 <code>dataList</code> 数组，将 <code>unzipUrl</code> 指向正确的模型文件。例如：</p>
+<pre><code class="language-javascript">{
+  <span class="hljs-attr">dataName</span>: <span class="hljs-string">&quot;你的模型名称&quot;</span>,
+  <span class="hljs-attr">type</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">visible</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">unzipUrl</span>: <span class="hljs-string">&quot;./Tileset/你的模型文件夹名/tileset.json&quot;</span>
+}
+</code></pre>
+<p>代码中已有示例，可参照修改。</p>
+<h2 id="3-启动本地服务器">3. 启动本地服务器</h2>
+<p>打开终端（命令行），进入项目根目录（即包含 <code>index.html</code> 的文件夹）。</p>
+<p>执行以下命令：</p>
+<pre><code class="language-bash">npx http-server
+</code></pre>
+<p>或使用 Python：</p>
+<pre><code># Python 3
+python -m http.server 8080
+
+# Python 2
+python -m SimpleHTTPServer 8080
+</code></pre>
+<p>终端会显示访问地址，如 <code>http://localhost:8080</code>。</p>
+<h2 id="4-在浏览器中查看">4. 在浏览器中查看</h2>
+<p>打开浏览器，访问 <code>http://localhost:8080</code>（具体端口以终端显示为准）。</p>
+<p>页面加载后，在左侧面板中找到你的模型，点击开关即可加载并显示 3D 模型。</p>
+<p>如果模型未出现，可以按 <code>Ctrl+R</code>（Windows/Linux）或 <code>Cmd+R</code>（Mac）刷新页面重试。</p>
+<hr>
+<h2 id="注意事项">注意事项</h2>
+<ul>
+<li>模型文件夹内必须包含 <code>tileset.json</code> 文件，这是 Cesium 3D Tiles 的入口文件。</li>
+<li>如果模型较大，加载可能需要几秒钟，请耐心等待。</li>
+<li>保持终端窗口开启，关闭终端则服务停止。</li>
+</ul>
+
+            
+            
+        </body>
+        </html>
