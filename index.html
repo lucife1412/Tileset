@@ -158,18 +158,39 @@
 
           try {
             // 3. 异步添加天地图影像底图
+            // 优先尝试加载本地离线切片 (Z0-Z2)
+            const offlineImgLayer = new Cesium.UrlTemplateImageryProvider({
+              url: "./libs/map/img_w/{z}/{x}/{y}.png",
+              minimumLevel: 0,
+              maximumLevel: 18,
+              tilingScheme: new Cesium.WebMercatorTilingScheme(), // 天地图w投影对应WebMercator
+            });
+            _viewer.imageryLayers.addImageryProvider(offlineImgLayer);
+
+            // 尝试加载在线天地图（如果网络恢复，可以在高层级显示）
             const imgLayer = new Cesium.WebMapTileServiceImageryProvider({
               url: `https://t{s}.tianditu.gov.cn/img_w/wmts?tk=${TDT_TK}`,
               layer: "img",
               style: "default",
               format: "tiles",
               tileMatrixSetID: "w",
-              subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"], // 使用多子域名加速
+              subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"], 
               maximumLevel: 18,
             });
-            _viewer.imageryLayers.addImageryProvider(imgLayer);
+            // 这里的错误处理是为了防止在线加载失败阻塞后续逻辑
+            try {
+              _viewer.imageryLayers.addImageryProvider(imgLayer);
+            } catch (e) { console.warn("在线影像加载失败"); }
 
-            // 4. 异步添加中文标注
+            // 4. 异步添加中文标注 (本地 + 在线)
+            const offlineCiaLayer = new Cesium.UrlTemplateImageryProvider({
+               url: "./libs/map/cia_w/{z}/{x}/{y}.png",
+               minimumLevel: 0,
+               maximumLevel: 18,
+               tilingScheme: new Cesium.WebMercatorTilingScheme(),
+            });
+            _viewer.imageryLayers.addImageryProvider(offlineCiaLayer);
+
             const ciaLayer = new Cesium.WebMapTileServiceImageryProvider({
               url: `https://t{s}.tianditu.gov.cn/cia_w/wmts?tk=${TDT_TK}`,
               layer: "cia",
@@ -178,7 +199,10 @@
               tileMatrixSetID: "w",
               subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
             });
-            _viewer.imageryLayers.addImageryProvider(ciaLayer);
+            try {
+              _viewer.imageryLayers.addImageryProvider(ciaLayer);
+            } catch (e) { console.warn("在线标注加载失败"); }
+
           } catch (e) {
             console.warn("天地图加载异常，可能是网络原因", e);
           }
