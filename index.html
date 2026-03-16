@@ -8,8 +8,8 @@
 
   <!-- <meta name="referrer" content="no-referrer" /> -->
 
-  <link href="https://unpkg.com/cesium@1.126.0/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
-  <script src="https://unpkg.com/cesium@1.126.0/Build/Cesium/Cesium.js"></script>
+  <link href="./libs/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <script src="./libs/Cesium/Cesium.js"></script>
 
   <script src="./libs/vue.global.js"></script>
   <link rel="stylesheet" href="./libs/element-plus.css" />
@@ -124,22 +124,39 @@
         const initCesium = async () => {
           Cesium.Ion.defaultAccessToken = CESIUM_TOKEN;
 
+          let terrain;
           try {
             // 1.126.0 强制使用异步地形
-            const terrain = await Cesium.createWorldTerrainAsync();
-            // 2. 初始化 Viewer (先不传 imageryProvider，防止初始化卡死)
-            const _viewer = new Cesium.Viewer("cesiumContainer", {
-              terrainProvider: terrain,
-              animation: false,
-              timeline: false,
-              baseLayerPicker: false,
-              geocoder: false,
-              infoBox: false,
-              selectionIndicator: false,
-              navigationHelpButton: false,
-              sceneModePicker: false,
-            });
+            // 尝试加载在线地形，如果离线则回退到椭球体
+            terrain = await Cesium.createWorldTerrainAsync();
+          } catch (e) {
+            console.warn("在线地形加载失败，切换为离线椭球体模式");
+            terrain = new Cesium.EllipsoidTerrainProvider();
+          }
 
+          // 2. 初始化 Viewer (显式禁用默认影像，防止离线时加载 Bing Maps 报错)
+          const _viewer = new Cesium.Viewer("cesiumContainer", {
+            terrainProvider: terrain,
+            animation: false,
+            timeline: false,
+            baseLayerPicker: false,
+            geocoder: false,
+            infoBox: false,
+            selectionIndicator: false,
+            navigationHelpButton: false,
+            sceneModePicker: false,
+            imageryProvider: false, // 关键：禁用默认在线底图
+            contextOptions: {
+              webgl: {
+                alpha: true,
+              },
+            },
+          });
+
+          // 设置地球背景色（当无底图时显示的颜色，例如深蓝色海洋）
+          _viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString("#0b1d36");
+
+          try {
             // 3. 异步添加天地图影像底图
             const imgLayer = new Cesium.WebMapTileServiceImageryProvider({
               url: `https://t{s}.tianditu.gov.cn/img_w/wmts?tk=${TDT_TK}`,
@@ -162,20 +179,20 @@
               subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
             });
             _viewer.imageryLayers.addImageryProvider(ciaLayer);
-
-            viewer.value = _viewer;
-
-            // 5. 初始视角定位到中国
-            _viewer.camera.flyTo({
-              destination: Cesium.Cartesian3.fromDegrees(
-                116.39,
-                39.9,
-                15000000.0,
-              ),
-            });
           } catch (e) {
-            console.error("Cesium 初始化异常:", e);
+            console.warn("天地图加载异常，可能是网络原因", e);
           }
+
+          viewer.value = _viewer;
+
+          // 5. 初始视角定位到中国
+          _viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(
+              116.39,
+              39.9,
+              15000000.0,
+            ),
+          });
         };
 
         const loadModel = async (item) => {
