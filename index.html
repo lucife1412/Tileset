@@ -8,14 +8,13 @@
 
   <!-- <meta name="referrer" content="no-referrer" /> -->
 
-  <!-- Local Resources -->
-  <link href="./libs/Cesium/Widgets/widgets.css" rel="stylesheet" />
-  <script src="./libs/Cesium/Cesium.js"></script>
+  <link href="https://unpkg.com/cesium@1.126.0/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <script src="https://unpkg.com/cesium@1.126.0/Build/Cesium/Cesium.js"></script>
 
-  <script src="./libs/vue.global.js"></script>
-  <link rel="stylesheet" href="./libs/element-plus.css" />
-  <script src="./libs/element-plus.js"></script>
-  <script src="./libs/element-plus-icons.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+  <script src="https://unpkg.com/element-plus"></script>
+  <script src="https://unpkg.com/@element-plus/icons-vue"></script>
 
   <style>
     html,
@@ -123,12 +122,11 @@
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ZTFkNThlNi1jNjVkLTRjNDctYTU2YS05NDIwMWU4ZjMwMGMiLCJpZCI6Mjk3MDU3LCJpYXQiOjE3NDU1NDU2OTB9.3dOscDlqKOuQxwLl3pVHoeB841kVWWdjTxQVX7m659c";
 
         const initCesium = async () => {
-          // Cesium.Ion.defaultAccessToken = CESIUM_TOKEN; // 离线模式不需要
+          Cesium.Ion.defaultAccessToken = CESIUM_TOKEN;
 
           try {
-            // 1.126.0 强制使用异步地形 (离线模式改用椭球体地形)
-            const terrain = new Cesium.EllipsoidTerrainProvider();
-            
+            // 1.126.0 强制使用异步地形
+            const terrain = await Cesium.createWorldTerrainAsync();
             // 2. 初始化 Viewer (先不传 imageryProvider，防止初始化卡死)
             const _viewer = new Cesium.Viewer("cesiumContainer", {
               terrainProvider: terrain,
@@ -140,23 +138,28 @@
               selectionIndicator: false,
               navigationHelpButton: false,
               sceneModePicker: false,
-              // 必须设置 imageryProvider 为 false 以避免默认必应地图请求
-              imageryProvider: false, 
             });
 
-            // 3. 添加本地离线天地图影像底图
-            const imgLayer = new Cesium.UrlTemplateImageryProvider({
-              url: "./tiles/img_w/{z}/{x}/{y}.png",
-              maximumLevel: 3,
-              tilingScheme: new Cesium.WebMercatorTilingScheme()
+            // 3. 异步添加天地图影像底图
+            const imgLayer = new Cesium.WebMapTileServiceImageryProvider({
+              url: `https://t{s}.tianditu.gov.cn/img_w/wmts?tk=${TDT_TK}`,
+              layer: "img",
+              style: "default",
+              format: "tiles",
+              tileMatrixSetID: "w",
+              subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"], // 使用多子域名加速
+              maximumLevel: 18,
             });
             _viewer.imageryLayers.addImageryProvider(imgLayer);
 
-            // 4. 添加本地离线中文标注
-            const ciaLayer = new Cesium.UrlTemplateImageryProvider({
-              url: "./tiles/cia_w/{z}/{x}/{y}.png",
-              maximumLevel: 3,
-              tilingScheme: new Cesium.WebMercatorTilingScheme()
+            // 4. 异步添加中文标注
+            const ciaLayer = new Cesium.WebMapTileServiceImageryProvider({
+              url: `https://t{s}.tianditu.gov.cn/cia_w/wmts?tk=${TDT_TK}`,
+              layer: "cia",
+              style: "default",
+              format: "tiles",
+              tileMatrixSetID: "w",
+              subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
             });
             _viewer.imageryLayers.addImageryProvider(ciaLayer);
 
