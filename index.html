@@ -209,6 +209,17 @@
 
           viewer.value = _viewer;
 
+          // 简化 zoomTo 行为：始终以地球中心为参考，使缩放后地球保持在屏幕中央
+          const zoomToTileset = (tileset) => {
+            if (!tileset || !tileset.boundingSphere) return;
+            const bs = tileset.boundingSphere;
+            const distance = bs.radius * 6;
+            viewer.value.camera.flyToBoundingSphere(bs, {
+              offset: new Cesium.HeadingPitchRange(0, -Math.PI / 2, distance),
+              duration: 1.0,
+            });
+          };
+
           // 5. 初始视角定位到中国
           _viewer.camera.flyTo({
             destination: Cesium.Cartesian3.fromDegrees(
@@ -217,6 +228,8 @@
               15000000.0,
             ),
           });
+          // 暴露给其他函数使用
+          viewer.value.zoomToTileset = zoomToTileset;
         };
 
         const loadModel = async (item) => {
@@ -269,7 +282,7 @@
             );
             viewer.value.scene.primitives.add(tileset);
             modelCache.set(item.dataId, tileset);
-            viewer.value.zoomTo(tileset);
+            viewer.value.zoomToTileset?.(tileset);
             console.log("模型加载成功");
           } catch (e) {
             console.error("模型加载失败，请检查 CORS 限制或文件是否存在", e);
@@ -283,7 +296,7 @@
           const tileset = modelCache.get(item.dataId);
           if (tileset) {
             tileset.show = item.visible;
-            if (item.visible) viewer.value.zoomTo(tileset);
+            if (item.visible) viewer.value.zoomToTileset?.(tileset);
           } else if (item.visible) {
             // 关键点：确保 URL 以 tileset.json 结尾
             let url = item.unzipUrl;
@@ -300,7 +313,7 @@
         const selectModel = (item) => {
           currentId.value = item.dataId;
           const tileset = modelCache.get(item.dataId);
-          if (tileset) viewer.value.zoomTo(tileset);
+          if (tileset) viewer.value.zoomToTileset?.(tileset);
         };
 
         const fetchData = () => {
