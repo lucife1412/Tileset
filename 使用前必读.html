@@ -158,19 +158,24 @@
 }
 </code></pre>
 <p>代码中已有示例，可参照修改。</p>
-<h2 id="3-启动本地服务器">3. 启动本地服务器</h2>
-<p>打开终端（命令行），进入项目根目录（即包含 <code>index.html</code> 的文件夹）。</p>
-<p>执行以下命令：</p>
+<h2 id="3-启动本地服务器">3. 启动本地服务器（推荐）</h2>
+<p>为了解决无网络或无开发环境（Node.js/Python）的问题，我们提供了一个独立运行的服务器程序。</p>
+<p><strong>双击运行 <code>server.exe</code></strong></p>
+<p>运行后：</p>
+<ol>
+<li>会出现一个黑色命令行窗口（请不要关闭它）。</li>
+<li>系统会自动打开默认浏览器并跳转到地图页面。</li>
+<li>如果浏览器没有自动打开，请手动访问：<a href="http://localhost:8080">http://localhost:8080</a></li>
+</ol>
+<h3 id="备选方案（如果有开发环境）">备选方案（如果有开发环境）</h3>
+<p>如果不想使用 exe，也可以使用以下方式启动：</p>
+<p><strong>Node.js:</strong></p>
 <pre><code class="language-bash">npx http-server
 </code></pre>
-<p>或使用 Python：</p>
+<p><strong>Python:</strong></p>
 <pre><code># Python 3
 python -m http.server 8080
-
-# Python 2
-python -m SimpleHTTPServer 8080
 </code></pre>
-<p>终端会显示访问地址，如 <code>http://localhost:8080</code>。</p>
 <h2 id="4-在浏览器中查看">4. 在浏览器中查看</h2>
 <p>打开浏览器，访问 <code>http://localhost:8080</code>（具体端口以终端显示为准）。</p>
 <p>页面加载后，在左侧面板中找到你的模型，点击开关即可加载并显示 3D 模型。</p>
