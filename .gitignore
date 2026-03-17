@@ -1,4 +1,3 @@
-*
-!.gitignore
-!index.html
-!使用前必读.html
+/办公楼
+/空间站
+/libs
